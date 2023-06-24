@@ -10,15 +10,24 @@ class Action(Enum):
     BUY_RESERVED_CARD = 4
 
 
-def _actual_cost(player: Player, cost: GemSet) -> GemSet:
+def _actual_cost(player: Player, card: DevelopCard) -> GemSet:
     gems = player.cards_gem
-    return GemSet({gem: max(0, cnt - gems[gem]) for gem, cnt in cost.coins.items()})
+    cost = GemSet(
+        {gem: max(0, cnt - gems[gem]) for gem, cnt in card.cost.coins.items()}
+    )
+    if player.coins >= cost:
+        return cost
+    for gem, cnt in cost.coins.items():
+        extra_coin = max(0, cnt - player.coins[gem])
+        cost.coins[Gem.GOLD] += extra_coin
+        cost.coins[gem] = min(cnt, player.coins[gem])
+    return cost
 
 
 def get_coin(player: Player, deck: Deck, coins: GemSet):
-    if coins.count <= 3 and coins.count == coins.kind:
+    if coins.count <= 3 and coins.count == len(coins.kind):
         pass
-    if coins.kind == DeepCollect.KIND and coins.count == DeepCollect.AMOUT:
+    elif len(coins.kind) == DeepCollect.KIND_COUNT and coins.count == DeepCollect.AMOUT:
         if deck.coins[coins.kind[0]] < DeepCollect.DECK_LIMIT:
             raise ValueError("deck have insufficient coins")
     else:
@@ -28,7 +37,7 @@ def get_coin(player: Player, deck: Deck, coins: GemSet):
 
 
 def buy_card(player: Player, deck: Deck, card: DevelopCard):
-    cost = _actual_cost(player, card.cost)
+    cost = _actual_cost(player, card)
     if cost <= player.coins:
         player.coins.transfer(deck.coins, cost)
         player.cards.append(card)
@@ -38,18 +47,18 @@ def buy_card(player: Player, deck: Deck, card: DevelopCard):
 
 
 def reserve_card(player: Player, deck: Deck, card: DevelopCard):
-    if len(player.cards) < 3:
-        player.reserved.append(card)
-        if deck.coins[Gem.GOLD] > 0:
-            deck.coins.transfer(player.coins, GemSet({Gem.GOLD: 1}))
+    player.reserved.append(card)
+    if deck.coins[Gem.GOLD] > 0:
+        deck.coins.transfer(player.coins, GemSet({Gem.GOLD: 1}))
+        deck.cards[card.tier - 1].remove(card)
     else:
         raise ValueError("player have 3 cards")
 
 
 def buy_reserved_card(player: Player, deck: Deck, card: DevelopCard):
-    cost = _actual_cost(player, card.cost)
+    cost = _actual_cost(player, card)
     if cost <= player.coins:
-        player.coins.transfer(deck.coins, _actual_cost(player, cost))
+        player.coins.transfer(deck.coins, cost)
         player.cards.append(card)
         player.reserved.remove(card)
     else:

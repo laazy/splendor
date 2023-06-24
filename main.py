@@ -19,31 +19,29 @@ class Game:
         
     def round(self):
         print(self.deck)
-        print(f'actions: {Action.GET_COIN}. take coins, {Action.BUY_CARD}. buy card, '+
-              f'{Action.RESERVE_CARD}. reserve card, {Action.BUY_RESERVED_CARD}. buy reserved card, space: pass\n'+
-              'coins code: '+ ', '.join(f'{idx+1}{gem.value}' for idx, gem in enumerate(Gem)) + '\n'+
-              f'coins example: 1 1, means take two {Gem.RUBY.value}\n'+
-              f'coins example: 2 134 , means take {Gem.RUBY.value}{Gem.EMERALD.value}{Gem.DIAMOND.value}\n'+
+        print(f'actions: {Action.GET_COIN}.take coins, {Action.BUY_CARD}.buy card, '+
+              f'{Action.RESERVE_CARD}.reserve card, {Action.BUY_RESERVED_CARD}.buy reserved card, space: pass\n'+
+              'coins code: '+ ', '.join(f'{idx+1}{gem}' for idx, gem in enumerate(Gem)) + '\n'+
+              f'coins example: 1 1, means take two {Gem.RUBY}\n'+
+              f'coins example: 2 134 , means take {Gem.RUBY}{Gem.EMERALD}{Gem.DIAMOND}\n'+
               'buy card example: 3 12, means buy the second card of tier 1\n')
-        action = input('action: ').strip().split()
-        # action = self.actions.pop().strip().split()
+        if self.actions:
+            action = self.actions.pop().strip().split()
+        else:
+            action = input('action: ').strip().split()
         if len(action) != 2 or not action[0].isdecimal() or not action[1].isdecimal():
             print(f'invalid action: {action}')
             return
         player = self.deck.current_player
-        match(int(action[0])):
-            case 1:
-                self.deck.coins.transfer(player.coins, self.gem_set(action[1], 2))
-            case 2:
-                self.deck.coins.transfer(player.coins, self.gem_set(action[1], 1))
-            case 3:
+        match(Action(int(action[0]))):
+            case Action.GET_COIN:
+                get_coin(player, self.deck, self.gem_set(action[1], 1))
+            case Action.BUY_CARD:
                 buy_card(player, self.deck, self.card(action[1]))
-            case 4:
+            case Action.RESERVE_CARD:
                 reserve_card(player, self.deck, self.card(action[1]))
-            case 5:
-                buy_reserved_card(player, self.deck, self.card(action[1]))
-            case 2:
-                pass
+            case Action.BUY_RESERVED_CARD:
+                buy_reserved_card(player, self.deck, player.reserved[int(action[1])-1])
             case _:
                 print(f'invalid action: {action}')
         self.deck.round += 1
@@ -56,7 +54,8 @@ class Game:
 if __name__ == "__main__":
     # game = Game('Alice Bob Coco David'.split())
     game = Game('Alice'.split())
-    game.actions = '1 1,1 2,1 3,1 4,2 123,2 234,2 345,2 451,3 11'.split(',')
-    game.actions.reverse()
+    game.actions = '1 123'.split(',')
+    # game.actions = '1 1,1 2,1 3,1 4,2 123,2 234,2 345,2 451,3 11'.split(',')
+    # game.actions.reverse()
     game.deck.coins.transfer(game.deck.current_player.coins, GemSet({Gem.RUBY: 2, Gem.SAPPHIRE: 2, Gem.EMERALD: 2, Gem.DIAMOND: 2, Gem.ONYX: 2, Gem.GOLD: 2}))
     game.run()

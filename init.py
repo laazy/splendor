@@ -20,13 +20,13 @@ def init_card() -> list[list[DevelopCard]]:
     cards = [[], [], []]
     gems = [gem for gem in Gem if gem != Gem.GOLD]
     # 1 kind gem
-    for g in Gem:
+    for g in gems:
         _append_card(cards, 0, {g: 3}, g, 0, 2)
         _append_card(cards, 0, {g: 4}, g, 1, 1)
         _append_card(cards, 1, {g: 5}, g, 2, 2)
         _append_card(cards, 2, {g: 6}, g, 3, 2)
         _append_card(cards, 2, {g: 7}, g, 4, 1)
-    for g1, g2 in combinations(Gem, 2):
+    for g1, g2 in combinations(gems, 2):
         _append_card(cards, 0, {g1: 3}, g2, 0, 2)
         _append_card(cards, 0, {g1: 4}, g2, 1, 1)
         _append_card(cards, 1, {g1: 5}, g2, 2, 2)
