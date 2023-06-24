@@ -1,13 +1,13 @@
-from enum import Enum, auto
+from enum import Enum
 from game_basic import Player, Gem, GemSet, DevelopCard, Deck
 from rule import DeepCollect
 
 
 class Action(Enum):
-    GET_COIN = auto()
-    BUY_CARD = auto()
-    RESERVE_CARD = auto()
-    BUY_RESERVED_CARD = auto()
+    GET_COIN = 1
+    BUY_CARD = 2
+    RESERVE_CARD = 3
+    BUY_RESERVED_CARD = 4
 
 
 def _actual_cost(player: Player, cost: GemSet) -> GemSet:
