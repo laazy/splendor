@@ -38,11 +38,6 @@ class GemSet:
     def __ge__(self, other: 'GemSet'):
         return all(self.coins[gem] >= other.coins[gem] for gem in Gem)
 
-    def __str__(self) -> str:
-        return ' '.join(
-            [f'{gem.value}{cnt}' for gem, cnt in self.coins.items() if cnt > 0]
-        )
-
     def __getitem__(self, item):
         return self.coins[item]
 
@@ -53,9 +48,6 @@ class DevelopCard:
     cost: GemSet
     gem: Gem
     score: int
-
-    def __str__(self):
-        return f'{self.gem.value}: {self.cost}  [{self.score}]'
 
 
 @dataclass
@@ -76,9 +68,6 @@ class Player:
             gems[card.gem] += 1
         return GemSet(gems)
 
-    def __str__(self) -> str:
-        return f'Player {self.name}:\n      coins: {self.coins}\n      score: {self.score}\n     cards: {self.cards_gem}\n reserved: {self.reserved}'
-
 
 @dataclass
 class Deck:
@@ -90,20 +79,3 @@ class Deck:
     @property
     def current_player(self):
         return self.players[self.round % len(self.players)]
-
-    def __str__(self) -> str:
-        return (
-            f'============ round: {self.round} ============\n'
-            + '\n'.join(map(str, self.players))
-            + '\n'
-            + '\n'.join(
-                [
-                    f'============ tier {i+1} ============\n'
-                    + '\n'.join(map(str, cards[: min(len(cards), 4)]))
-                    for i, cards in enumerate(self.cards)
-                ]
-            )
-            + '\n============ coins ============\n'
-            + str(self.coins)
-            + f'\n============ {self.current_player.name} turn ============\n'
-        )
