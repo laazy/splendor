@@ -44,6 +44,7 @@ class Game:
                 buy_reserved_card(player, self.deck, player.reserved[int(action[1])-1])
             case _:
                 print(f'invalid action: {action}')
+        try_acquire_noble(player, self.deck)
         self.deck.round += 1
 
     def run(self):

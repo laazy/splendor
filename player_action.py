@@ -63,3 +63,10 @@ def buy_reserved_card(player: Player, deck: Deck, card: DevelopCard):
         player.reserved.remove(card)
     else:
         raise ValueError("player have insufficient coins")
+
+
+def try_acquire_noble(player: Player, deck: Deck):
+    for noble in deck.nobles:
+        if player.cards_gem >= noble.cost:
+            player.nobles.append(noble)
+            deck.nobles.remove(noble)

@@ -51,15 +51,22 @@ class DevelopCard:
 
 
 @dataclass
+class Noble:
+    cost: GemSet
+    score: int
+
+
+@dataclass
 class Player:
     name: str
     coins: GemSet = field(default_factory=GemSet)
     cards: list[DevelopCard] = field(default_factory=list)
     reserved: list[DevelopCard] = field(default_factory=list)
+    nobles: list[Noble] = field(default_factory=list)
 
     @property
     def score(self) -> int:
-        return sum(card.score for card in self.cards)
+        return sum(card.score for card in self.cards) + sum(noble.score for noble in self.nobles)
 
     @property
     def cards_gem(self) -> GemSet:
@@ -74,6 +81,7 @@ class Deck:
     players: list[Player]
     cards: list[list[DevelopCard]]
     coins: GemSet
+    nobles: list[Noble]
     round = 0
 
     @property
